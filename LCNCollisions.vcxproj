@@ -145,7 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Collisions\CollisionAlgorithms.h" />
+    <ClInclude Include="Source\Collisions\CollisionResult.h" />
+    <ClInclude Include="Source\Shapes\AABB.h" />
     <ClInclude Include="Source\Shapes\Line.h" />
+    <ClInclude Include="Source\Shapes\Point.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
