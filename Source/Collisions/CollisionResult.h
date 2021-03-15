@@ -2,7 +2,7 @@
 
 namespace LCN
 {
-	template<class C1, class C2>
+	template<class Shape1, class Shape2>
 	class CollisionResult
 	{
 	public:

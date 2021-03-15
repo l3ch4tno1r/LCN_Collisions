@@ -5,17 +5,30 @@
 namespace LCN
 {
 	template<typename T, size_t Dim>
-	class AABB
+	class AABB;
+
+	template<typename T>
+	class AABB<T, 2>
 	{
 	public:
 		using ValType     = T;
-		using HVectorType = HVectorND<T, Dim>;
+		using RefType     = ValType&;
+		using HVectorType = HVectorND<T, 2>;
 
 		AABB(const HVectorType& topleft, ValType width, ValType height) :
 			m_TopLeft(topleft),
 			m_Width(width),
 			m_Height(height)
 		{}
+
+		inline       HVectorType& TopLeft()       { return m_TopLeft; }
+		inline const HVectorType& TopLeft() const { return m_TopLeft; }
+
+		inline RefType Width()       { return m_Width; }
+		inline ValType Width() const { return m_Width; }
+
+		inline RefType Height()       { return m_Height; }
+		inline ValType Height() const { return m_Height; }
 
 	private:
 		HVectorType m_TopLeft;

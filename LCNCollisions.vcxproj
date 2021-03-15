@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collisions\CollisionAlgorithms.h" />
+    <ClInclude Include="Source\Collisions\CollisionFunctions.h" />
     <ClInclude Include="Source\Collisions\CollisionResult.h" />
     <ClInclude Include="Source\Shapes\AABB.h" />
     <ClInclude Include="Source\Shapes\Line.h" />
