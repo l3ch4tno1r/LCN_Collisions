@@ -150,6 +150,7 @@
     <ClInclude Include="Source\Collisions\CollisionResult.h" />
     <ClInclude Include="Source\Shapes\AABB.h" />
     <ClInclude Include="Source\Shapes\Line.h" />
+    <ClInclude Include="Source\Shapes\Plane.h" />
     <ClInclude Include="Source\Shapes\Point.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

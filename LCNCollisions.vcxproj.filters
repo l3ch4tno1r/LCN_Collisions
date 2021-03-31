@@ -33,5 +33,8 @@
     <ClInclude Include="Source\Collisions\CollisionAlgorithms.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Shapes\Plane.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
