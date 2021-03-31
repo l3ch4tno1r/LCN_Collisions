@@ -21,7 +21,7 @@
     <ClInclude Include="Source\Collisions\CollisionResult.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Collisions\CollisionFunctions.h">
+    <ClInclude Include="Source\Collisions\CollisionCore.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Source\Shapes\AABB.h">
