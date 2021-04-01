@@ -1,12 +1,25 @@
 #pragma once
 
+#include <cmath>
+
 #include "LCN_Collisions/Source/Shapes/Point.h"
 #include "LCN_Collisions/Source/Shapes/Line.h"
 #include "LCN_Collisions/Source/Shapes/AABB.h"
+#include "LCN_Collisions/Source/Shapes/Plane.h"
+
+#include "LCN_Collisions/Source/Collisions/CollisionResult.h"
+
+#define FUZZ_FACTOR T(0.001);
 
 namespace LCN
 {
-	// Allows to perform symetry (DetectCollision(a, b) <=> DetectCollision(b, a))
+#pragma region Dectection
+
+	//////////////////////////////////
+	//-- Collision detection only --//
+	//////////////////////////////////
+
+	// Allows symetry (DetectCollision(a, b) <=> DetectCollision(b, a))
 	template<class Shape1, class Shape2>
 	inline bool DetectCollision(const Shape1& shape1, const Shape2& shape2)
 	{
@@ -38,4 +51,49 @@ namespace LCN
 
 		return minx <= maxx && miny <= maxy;
 	}
+
+	// Plane vs Line
+	template<typename T>
+	bool DetectCollision(const Plane<T>& plane, const Line<T, 3>& line)
+	{
+		return std::abs(plane.Normal() | line.Direction()) > FUZZ_FACTOR;
+	}
+
+#pragma endregion
+
+#pragma region Computation
+
+	///////////////////////////////////////
+	//-- Compute collision information --//
+	///////////////////////////////////////
+
+	// Allows symetry (DetectCollision(a, b) <=> DetectCollision(b, a))
+	template<class Shape1, class Shape2>
+	inline auto ComputeCollision(const Shape1& shape1, const Shape2& shape2)
+	{
+		return ComputeCollision(shape2, shape1);
+	}
+
+	template<typename T>
+	auto ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line)
+	{
+		using ResulType   = CollisionResult<Plane<T>, Line<T, 3>>;
+		using HVectorType = typename Line<T, 3>::HVectorType;
+
+		if (!DetectCollision(plane, line))
+			return ResulType(false);
+
+		const HVectorType& p = plane.Origin();
+		const HVectorType& n = plane.Normal();
+		const HVectorType& o = line.Origin();
+		const HVectorType& d = line.Direction();
+
+		HVector3Df po = o - p;
+
+		T k = -(po | n) / (d | n);
+		
+		return ResulType(true, k * d + o);
+	}
+
+#pragma endregion
 }
