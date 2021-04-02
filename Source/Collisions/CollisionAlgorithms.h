@@ -28,7 +28,7 @@ namespace LCN
 
 	// AABB vs point
 	template<typename T>
-	bool DetectCollision(const AABB<T, 2>& aabb, const Point<T, 2>& point)
+	inline bool DetectCollision(const AABB<T, 2>& aabb, const Point<T, 2>& point)
 	{
 		const Point<T, 2>& topLeft = aabb.TopLeft();
 
@@ -39,7 +39,7 @@ namespace LCN
 
 	// AABB vs AABB
 	template<typename T>
-	bool DetectCollision(const AABB<T, 2>& aabb1, const AABB<T, 2>& aabb2)
+	inline bool DetectCollision(const AABB<T, 2>& aabb1, const AABB<T, 2>& aabb2)
 	{
 		T TLx1 = aabb1.TopLeft().x(), TLx2 = aabb2.TopLeft().x();
 		T TLy1 = aabb1.TopLeft().y(), TLy2 = aabb2.TopLeft().y();
@@ -54,9 +54,16 @@ namespace LCN
 
 	// Plane vs Line
 	template<typename T>
-	bool DetectCollision(const Plane<T>& plane, const Line<T, 3>& line)
+	inline bool DetectCollision(const Plane<T>& plane, const Line<T, 3>& line)
 	{
 		return std::abs(plane.Normal() | line.Direction()) > FUZZ_FACTOR;
+	}
+
+	// Plane vs Plane
+	template<typename T>
+	inline bool DetectCollision(const Plane<T>& plane1, const Plane<T>& plane2)
+	{
+		return std::abs(plane1.Normal() | plane2.Normal()) > FUZZ_FACTOR;
 	}
 
 #pragma endregion
@@ -67,21 +74,21 @@ namespace LCN
 	//-- Compute collision information --//
 	///////////////////////////////////////
 
-	// Allows symetry (DetectCollision(a, b) <=> DetectCollision(b, a))
-	template<class Shape1, class Shape2>
-	inline auto ComputeCollision(const Shape1& shape1, const Shape2& shape2)
+	// Allows symetry (ComputeCollision(a, b) <=> DetectCollision(b, a))
+	template<class Shape1, class Shape2, class ResultType>
+	inline void ComputeCollision(const Shape1& shape1, const Shape2& shape2, ResultType& result)
 	{
-		return ComputeCollision(shape2, shape1);
+		ComputeCollision(shape2, shape1, result);
 	}
 
+	// Plane vs Line intersection
 	template<typename T>
-	auto ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line)
+	inline void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, PlaneVSLineCollision<T>& result)
 	{
-		using ResulType   = CollisionResult<Plane<T>, Line<T, 3>>;
 		using HVectorType = typename Line<T, 3>::HVectorType;
 
-		if (!DetectCollision(plane, line))
-			return ResulType(false);
+		if (!(result.m_Collide = DetectCollision(plane, line)))
+			return;
 
 		const HVectorType& p = plane.Origin();
 		const HVectorType& n = plane.Normal();
@@ -92,7 +99,7 @@ namespace LCN
 
 		T k = -(po | n) / (d | n);
 		
-		return ResulType(true, k * d + o);
+		result.m_Intersection = k * d + o;
 	}
 
 #pragma endregion

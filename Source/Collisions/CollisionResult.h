@@ -7,18 +7,22 @@
 
 namespace LCN
 {
+	/////////////////////////////
+	//-- CollisionResultBase --//
+	/////////////////////////////
+
 	class CollisionResultBase
 	{
 	public:
-		inline CollisionResultBase(bool collide) :
-			m_Collide(collide)
-		{}
-
 		inline operator bool() const { return m_Collide; }
 
-	private:
+	protected:
 		bool m_Collide = false;
 	};
+
+	/////////////////////////////////////////////
+	//-- CollisionResult and specializations --//
+	/////////////////////////////////////////////
 
 	template<class Shape1, class Shape2>
 	class CollisionResult;
@@ -27,6 +31,7 @@ namespace LCN
 	class CollisionResult<Plane<T>, Line<T, 3>> : public CollisionResultBase
 	{
 	public:
+		using ThisType  = CollisionResult<Plane<T>, Line<T, 3>>;
 		using Base      = CollisionResultBase;
 		using PlaneType = Plane<T>;
 		using LineType  = Line<T, 3>;
@@ -35,18 +40,21 @@ namespace LCN
 
 		using HVectorType = typename PlaneType::HVectorType;
 
-		CollisionResult(bool collide) :
-			Base(collide)
-		{}
-
-		CollisionResult(bool collide, const HVectorType& intersection) :
-			Base(collide),
-			m_Intersection(intersection)
-		{}
-
 		const HVectorType& Result() const { return m_Intersection; }
+
+		template<typename T>
+		friend void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, CollisionResult<Plane<T>, Line<T, 3>>& result);
 
 	private:
 		HVectorType m_Intersection;
 	};
+
+	template<typename T>
+	using PlaneVSLineCollision = CollisionResult<Plane<T>, Line<T, 3>>;
+
+	///////////////////////////////
+	//-- Convenience utilities --//
+	///////////////////////////////
+
+	using PlaneVSLineCollision3f = PlaneVSLineCollision<float>;
 }
