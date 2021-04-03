@@ -1,6 +1,6 @@
 #pragma once
 
-#include <LCN_Math/Source/Geometry/Vector.h>
+#include <LCN_Math/Source/Geometry/Geometry.h>
 
 namespace LCN
 {
@@ -14,9 +14,10 @@ namespace LCN
 		using ValType     = T;
 		using RefType     = ValType&;
 		using HVectorType = HVectorND<T, 2>;
+		using RVectorType = VectorND<T, 2>;
 
-		AABB(const HVectorType& topleft, ValType width, ValType height) :
-			m_TopLeft(topleft),
+		AABB(const RVectorType& topleft, ValType width, ValType height) :
+			m_TopLeft(topleft, ValType(1)),
 			m_Width(width),
 			m_Height(height)
 		{}

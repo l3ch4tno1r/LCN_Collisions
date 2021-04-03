@@ -1,7 +1,11 @@
 #pragma once
 
+/*
 #include <LCN_Math/Source/Matrix/MatrixBlock.h>
 #include <LCN_Math/Source/Geometry/Vector.h>
+*/
+
+#include <LCN_Math/Source/Geometry/Geometry.h>
 
 namespace LCN
 {
@@ -11,10 +15,11 @@ namespace LCN
 	public:
 		using ValType     = T;
 		using HVectorType = HVectorND<T, Dim>;
+		using RVectorType = VectorND<T, Dim>;
 
-		Line(const HVectorType& origin, const HVectorType& direction) :
-			m_Origin(origin),
-			m_Direction(direction)
+		Line(const RVectorType& origin, const RVectorType& direction) :
+			m_Origin(origin, ValType(1)),
+			m_Direction(direction, ValType(0))
 		{
 			auto dirVector = m_Direction.Vector();
 

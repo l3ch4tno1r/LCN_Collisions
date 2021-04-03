@@ -1,7 +1,6 @@
 #pragma once
 
-#include <LCN_Math/Source/Matrix/MatrixBlock.h>
-#include <LCN_Math/Source/Geometry/Vector.h>
+#include <LCN_Math/Source/Geometry/Geometry.h>
 
 namespace LCN
 {
@@ -11,10 +10,11 @@ namespace LCN
 	public:
 		using ValType     = T;
 		using HVectorType = HVector3Df;
+		using RVectorType = Vector3Df;
 
-		Plane(const HVectorType& origin, const HVectorType& normal) :
-			m_Origin(origin),
-			m_Normal(normal)
+		Plane(const RVectorType& origin, const RVectorType& normal) :
+			m_Origin(origin, ValType(1)),
+			m_Normal(normal, ValType(0))
 		{
 			auto normalVector = m_Normal.Vector();
 

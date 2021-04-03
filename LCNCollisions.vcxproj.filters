@@ -36,5 +36,8 @@
     <ClInclude Include="Source\Shapes\Plane.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Shapes\Sphere.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

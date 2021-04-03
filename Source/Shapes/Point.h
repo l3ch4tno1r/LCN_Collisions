@@ -1,6 +1,11 @@
 #pragma once
 
+/*
+#include <LCN_Math/Source/Matrix/MatrixBlock.h>
 #include <LCN_Math/Source/Geometry/Vector.h>
+*/
+
+#include <LCN_Math/Source/Geometry/Geometry.h>
 
 namespace LCN
 {
