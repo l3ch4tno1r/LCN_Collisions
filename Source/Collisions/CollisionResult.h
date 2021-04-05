@@ -38,8 +38,9 @@ namespace LCN
 	class CollisionResult<Plane<T>, Line<T, 3>> : public CollisionResultBase
 	{
 	public:
-		using PlaneType = Plane<T>;
-		using LineType  = Line<T, 3>;
+		using ValType   = T;
+		using PlaneType = Plane<ValType>;
+		using LineType  = Line<ValType, 3>;
 
 		static_assert(std::is_same_v<typename PlaneType::HVectorType, typename LineType::HVectorType>);
 
@@ -47,11 +48,14 @@ namespace LCN
 
 		const HVectorType& Result() const { return m_Intersection; }
 
+		const ValType Coordinate() const { return m_Coordinate; }
+
 		template<typename T>
 		friend void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, CollisionResult<Plane<T>, Line<T, 3>>& result);
 
 	private:
 		HVectorType m_Intersection;
+		ValType     m_Coordinate;
 	};
 
 	template<typename T>

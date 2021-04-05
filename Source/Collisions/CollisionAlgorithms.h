@@ -115,6 +115,7 @@ namespace LCN
 
 		T k = -(po | n) / (d | n);
 		
+		result.m_Coordinate   = k;
 		result.m_Intersection = k * d + o;
 	}
 
