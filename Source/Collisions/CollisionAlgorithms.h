@@ -136,11 +136,14 @@ namespace LCN
 		if (!(result.m_Collide = (delta >= 0)))
 			return;
 
-		T t1 = (-2 * vDotCO + std::sqrt(delta)) / 2;
-		T t2 = (-2 * vDotCO - std::sqrt(delta)) / 2;
+		T t1 = (-2 * vDotCO - std::sqrt(delta)) / 2;
+		T t2 = (-2 * vDotCO + std::sqrt(delta)) / 2;
 
-		result.m_Intersections[0] = t1 * line.Direction() + line.Origin();
-		result.m_Intersections[1] = t2 * line.Direction() + line.Origin();
+		result.m_Intersections[0].Distance = t1;
+		result.m_Intersections[1].Distance = t2;
+
+		result.m_Intersections[0].Point = t1 * line.Direction() + line.Origin();
+		result.m_Intersections[1].Point = t2 * line.Direction() + line.Origin();
 	}
 
 	// AABB vs AABB

@@ -73,30 +73,38 @@ namespace LCN
 	class CollisionResult<SphereND<T, Dim>, Line<T, Dim>> : public CollisionResultBase
 	{
 	public:
+		using ValType    = T;
 		using Base       = CollisionResultBase;
 		using SphereType = SphereND<T, Dim>;
 		using LineType   = Line<T, Dim>;
 
 		static_assert(std::is_same_v<typename SphereType::HVectorType, typename LineType::HVectorType>);
 
-		using HVectorType   = typename SphereType::HVectorType;
-		using ConstIterator = typename std::array<HVectorType, 2>::const_iterator;
+		using HVectorType = typename SphereType::HVectorType;
+
+		struct IntesectionType
+		{
+			HVectorType Point;
+			ValType     Distance;
+		};
+
+		using ConstIterator = typename std::array<IntesectionType, 2>::const_iterator;
 
 		CollisionResult() :
 			Base(),
-			m_Intersections { HVectorType(), HVectorType() }
+			m_Intersections{ IntesectionType(), IntesectionType() }
 		{}
 
 		template<typename T, size_t Dim>
 		friend void ComputeCollision(const SphereND<T, Dim>& sphere, const Line<T, Dim>& line, CollisionResult<SphereND<T, Dim>, Line<T, Dim>>& result);
 
-		const HVectorType& operator[](size_t i) { return m_Intersections[i]; }
+		const IntesectionType& operator[](size_t i) { return m_Intersections[i]; }
 
 		ConstIterator begin() const { return m_Intersections.begin(); }
 		ConstIterator end()   const { return m_Intersections.end(); }
 
 	private:
-		std::array<HVectorType, 2> m_Intersections;
+		std::array<IntesectionType, 2> m_Intersections;
 	};
 
 	template<typename T, size_t Dim>
