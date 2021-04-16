@@ -28,6 +28,41 @@ namespace LCN
 	template<class Shape1, class Shape2>
 	class CollisionResult;
 
+#pragma region Hyperplane vs Line
+
+	////////////////////////////
+	//-- Hyperplane vs Line --//
+	////////////////////////////
+
+	template<typename T, size_t Dim>
+	class CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>> : public CollisionResultBase
+	{
+	public:
+		using ValType = T;
+		using PlaneType = Hyperplane<T, Dim>;
+		using LineType  = Line<ValType, Dim>;
+
+		static_assert(std::is_same_v<typename PlaneType::HVectorType, typename LineType::HVectorType>);
+
+		using HVectorType = typename PlaneType::HVectorType;
+
+		const HVectorType& Result() const { return m_Intersection; }
+
+		const ValType Coordinate() const { return m_Coordinate; }
+
+		template<typename T, size_t Dim>
+		friend void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>& result);
+
+	private:
+		HVectorType m_Intersection;
+		ValType     m_Coordinate;
+	};
+
+	template<typename T, size_t Dim>
+	using HyperplaneVSLine = CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>;
+
+#pragma endregion
+
 #pragma region Plane vs Line
 
 	/////////////////////////////////
@@ -143,9 +178,35 @@ namespace LCN
 
 #pragma endregion
 
+#pragma region AABB vs Line
+
+	//////////////////////
+	//-- AABB vs Line --//
+	//////////////////////
+
+	template<typename T, size_t Dim>
+	class CollisionResult<AABB<T, Dim>, Line<T, Dim>> : public CollisionResultBase
+	{
+	public:
+		using AABBType = AABB<T, Dim>;
+		using LineType = Line<T, Dim>;
+
+		static_assert(std::is_same_v<typename AABBType::HVectorType, typename LineType::HVectorType>);
+
+		using HVectorType = typename AABBType::HVectorType;
+	};
+
+	template<typename T, size_t Dim>
+	using AABBVSLine = CollisionResult<AABB<T, Dim>, Line<T, Dim>>;
+
+#pragma endregion
+
 	///////////////////////////////
 	//-- Convenience utilities --//
 	///////////////////////////////
+
+	using HyperplaneVSLine2Df = HyperplaneVSLine<float, 2>;
+	using HyperplaneVSLine3Df = HyperplaneVSLine<float, 3>;
 
 	using PlaneVSLine3Df = PlaneVSLine<float>;
 

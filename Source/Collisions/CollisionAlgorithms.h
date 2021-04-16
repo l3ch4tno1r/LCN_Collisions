@@ -6,6 +6,7 @@
 #include "LCN_Collisions/Source/Shapes/Line.h"
 #include "LCN_Collisions/Source/Shapes/AABB.h"
 #include "LCN_Collisions/Source/Shapes/Plane.h"
+#include "LCN_Collisions/Source/Shapes/Hyperplane.h"
 #include "LCN_Collisions/Source/Shapes/Sphere.h"
 
 #include "LCN_Collisions/Source/Collisions/CollisionResult.h"
@@ -53,6 +54,13 @@ namespace LCN
 		return minx <= maxx && miny <= maxy;
 	}
 
+	// Hyperplane vs Line
+	template<typename T, size_t Dim>
+	inline bool DetectCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line)
+	{
+		return std::abs(hplane.Normal() | line.Direction()) > FUZZ_FACTOR;
+	}
+
 	// Plane vs Line
 	template<typename T>
 	inline bool DetectCollision(const Plane<T>& plane, const Line<T, 3>& line)
@@ -95,6 +103,28 @@ namespace LCN
 	inline void ComputeCollision(const Shape1& shape1, const Shape2& shape2, ResultType& result)
 	{
 		ComputeCollision(shape2, shape1, result);
+	}
+
+	// Hyperplane vs Line intersection
+	template<typename T, size_t Dim>
+	void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, HyperplaneVSLine<T, Dim>& result)
+	{
+		using HVectorType = typename Line<T, Dim>::HVectorType;
+
+		if (!(result.m_Collide = DetectCollision(hplane, line)))
+			return;
+
+		const HVectorType& p = hplane.Origin();
+		const HVectorType& n = hplane.Normal();
+		const HVectorType& o = line.Origin();
+		const HVectorType& d = line.Direction();
+
+		HVectorType po = o - p;
+
+		T k = -(po | n) / (d | n);
+		
+		result.m_Coordinate   = k;
+		result.m_Intersection = k * d + o;
 	}
 
 	// Plane vs Line intersection

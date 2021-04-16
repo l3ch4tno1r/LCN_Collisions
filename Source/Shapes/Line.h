@@ -27,11 +27,11 @@ namespace LCN
 			dirVector = dirVector / norm;
 		}
 
-		      HVectorType& Origin()       { return m_Origin; }
-		const HVectorType& Origin() const { return m_Origin; }
+		inline const HVectorType& Origin() const { return m_Origin; }
+		inline       HVectorType& Origin()       { return m_Origin; }
 
-		      HVectorType& Direction()       { return m_Direction; }
-		const HVectorType& Direction() const { return m_Direction; }
+		inline const HVectorType& Direction() const { return m_Direction; }
+		inline       HVectorType& Direction()       { return m_Direction; }
 
 	private:
 		HVectorType m_Origin;
