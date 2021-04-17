@@ -204,5 +204,33 @@ namespace LCN
 		result.m_Collide = true;
 	}
 
+	// AABB vs Line
+	template<typename T, size_t Dim>
+	inline void ComputeCollision(const AABB<T, Dim>& aabb, const Line<T, Dim>& line, AABBVSLine<T, Dim>& result)
+	{
+		using ValType              = T;
+		using RVectorType          = typename AABB<T, Dim>::RVectorType;
+		using HyperplaneType       = Hyperplane<T, Dim>;
+		using HyperplaneVSLineType = HyperplaneVSLine<T, Dim>;
+
+		for (size_t face = 0; face < 2 * Dim; ++face)
+		{
+			RVectorType origin = aabb.Min().Vector();
+			RVectorType normal;
+			
+			for (size_t i = 0; i < Dim; ++i)
+				normal[i] = (i == face % Dim ? (face < Dim ? ValType(1) : ValType(-1)) : ValType(0));
+			
+			HyperplaneType hplane{ origin, normal };
+			
+			HyperplaneVSLineType tempResult;
+			
+			ComputeCollision(hplane, line, tempResult);
+
+			if (!tempResult)
+				continue;
+		}
+	}
+
 #pragma endregion
 }
