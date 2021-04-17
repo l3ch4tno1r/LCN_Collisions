@@ -107,7 +107,7 @@ namespace LCN
 
 	// Hyperplane vs Line intersection
 	template<typename T, size_t Dim>
-	void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, HyperplaneVSLine<T, Dim>& result)
+	inline void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, HyperplaneVSLine<T, Dim>& result)
 	{
 		using HVectorType = typename Line<T, Dim>::HVectorType;
 
