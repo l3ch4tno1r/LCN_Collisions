@@ -161,7 +161,7 @@ namespace LCN
 		using HVectorType = typename AABBType::HVectorType;
 
 		CollisionResult() :
-			m_Intersection({{0, 0}, 0, 0})
+			m_Intersection({ {0, 0}, {0, 0} })
 		{}
 
 		const AABBType& Result() const { return m_Intersection; }
@@ -212,4 +212,7 @@ namespace LCN
 
 	using CircleVSLine2Df = SphereVSLine<float, 2>;
 	using SphereVSLine3Df = SphereVSLine<float, 3>;
+
+	using AABBVSAABB2Df = AABBVSAABB<float, 2>;
+	using AABBVSAABB3Df = AABBVSAABB<float, 3>;
 }

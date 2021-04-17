@@ -40,18 +40,21 @@ namespace LCN
 	}
 
 	// AABB vs AABB
-	template<typename T>
-	inline bool DetectCollision(const AABB<T, 2>& aabb1, const AABB<T, 2>& aabb2)
+	template<typename T, size_t Dim>
+	inline bool DetectCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2)
 	{
-		T TLx1 = aabb1.TopLeft().x(), TLx2 = aabb2.TopLeft().x();
-		T TLy1 = aabb1.TopLeft().y(), TLy2 = aabb2.TopLeft().y();
-		T BRx1 = aabb1.TopLeft().x() + aabb1.Width(),  BRx2 = aabb2.TopLeft().x() + aabb2.Width();
-		T BRy1 = aabb1.TopLeft().y() - aabb1.Height(), BRy2 = aabb2.TopLeft().y() - aabb2.Height();
+		using HVectorType = typename AABB<T, Dim>::HVectorType;
 
-		T minx = std::max(TLx1, TLx2), maxx = std::min(BRx1, BRx2);
-		T maxy = std::min(TLy1, TLy2), miny = std::max(BRy1, BRy2);
+		for (size_t i = 0; i < Dim; ++i)
+		{
+			T maxmin = std::max(aabb1.Min()[i], aabb2.Min()[i]);
+			T minmax = std::min(aabb1.Max()[i], aabb2.Max()[i]);
 
-		return minx <= maxx && miny <= maxy;
+			if (maxmin > minmax)
+				return false;
+		}
+
+		return true;
 	}
 
 	// Hyperplane vs Line
@@ -180,18 +183,25 @@ namespace LCN
 	template<typename T, size_t Dim>
 	inline void ComputeCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2, AABBVSAABB<T, Dim>& result)
 	{
-		T TLx1 = aabb1.TopLeft().x(), TLx2 = aabb2.TopLeft().x();
-		T TLy1 = aabb1.TopLeft().y(), TLy2 = aabb2.TopLeft().y();
-		T BRx1 = aabb1.TopLeft().x() + aabb1.Width(), BRx2 = aabb2.TopLeft().x() + aabb2.Width();
-		T BRy1 = aabb1.TopLeft().y() - aabb1.Height(), BRy2 = aabb2.TopLeft().y() - aabb2.Height();
+		using HVectorType = typename AABB<T, Dim>::HVectorType;
 
-		T minx = std::max(TLx1, TLx2), maxx = std::min(BRx1, BRx2);
-		T maxy = std::min(TLy1, TLy2), miny = std::max(BRy1, BRy2);
+		HVectorType& maxmin = result.m_Intersection.Min();
+		HVectorType& minmax = result.m_Intersection.Max();
 
-		if (!(result.m_Collide = minx <= maxx && miny <= maxy))
+		for (size_t i = 0; i < Dim; ++i)
+		{
+			maxmin[i] = std::max(aabb1.Min()[i], aabb2.Min()[i]);
+			minmax[i] = std::min(aabb1.Max()[i], aabb2.Max()[i]);
+
+			if (maxmin[i] < minmax[i])
+				continue;
+
+			result.m_Collide = false;
+
 			return;
+		}
 
-		result.m_Intersection = { { minx, maxy }, maxx - minx, maxy - miny };
+		result.m_Collide = true;
 	}
 
 #pragma endregion
