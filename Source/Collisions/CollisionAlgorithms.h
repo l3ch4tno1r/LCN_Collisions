@@ -208,18 +208,25 @@ namespace LCN
 	template<typename T, size_t Dim>
 	inline void ComputeCollision(const AABB<T, Dim>& aabb, const Line<T, Dim>& line, AABBVSLine<T, Dim>& result)
 	{
+		static_assert(Dim >= 2);
+
 		using ValType              = T;
-		using RVectorType          = typename AABB<T, Dim>::RVectorType;
-		using HyperplaneType       = Hyperplane<T, Dim>;
-		using HyperplaneVSLineType = HyperplaneVSLine<T, Dim>;
+		using RVectorType          = typename AABB<ValType, Dim>::RVectorType;
+		using HyperplaneType       = Hyperplane<ValType, Dim>;
+		using HyperplaneVSLineType = HyperplaneVSLine<ValType, Dim>;
+
+		auto resultIt = result.m_Intersections.begin();
 
 		for (size_t face = 0; face < 2 * Dim; ++face)
 		{
-			RVectorType origin = aabb.Min().Vector();
+			RVectorType origin = face < Dim ? aabb.Min().Vector() : aabb.Max().Vector();
 			RVectorType normal;
+
+			size_t coord = face % Dim;
 			
+			// TODO : optimize that
 			for (size_t i = 0; i < Dim; ++i)
-				normal[i] = (i == face % Dim ? (face < Dim ? ValType(1) : ValType(-1)) : ValType(0));
+				normal[i] = (i == coord ? (face < Dim ? ValType(-1) : ValType(1)) : ValType(0));
 			
 			HyperplaneType hplane{ origin, normal };
 			
@@ -229,7 +236,37 @@ namespace LCN
 
 			if (!tempResult)
 				continue;
+
+			bool isValid = false;
+
+			// Checks if other coordinates are valid
+			for (size_t i = 1; i < Dim; ++i)
+			{
+				size_t currentCoord = (coord + i) % Dim;
+
+				const auto& min    = aabb.Min();
+				const auto& max    = aabb.Max();
+				const auto& result = tempResult.Result();
+
+				isValid = (min[currentCoord] <= result[currentCoord] && result[currentCoord] <= max[currentCoord]);
+
+				if (!isValid)
+					break;
+			}
+
+			if (!isValid)
+				continue;
+
+			ASSERT(resultIt < result.m_Intersections.end());
+
+			resultIt->Point    = tempResult.Result();
+			resultIt->Distance = tempResult.Coordinate();
+
+			++resultIt;
 		}
+
+		if (result[0].Distance > result[1].Distance)
+			std::swap(result.m_Intersections[0], result.m_Intersections[1]);
 	}
 
 #pragma endregion

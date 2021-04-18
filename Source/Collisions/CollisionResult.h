@@ -204,6 +204,7 @@ namespace LCN
 		};
 
 		using ConstIterator = typename std::array<IntersectionType, 2>::const_iterator;
+		using ConstIterator = typename std::array<IntersectionType, 2>::const_iterator;
 
 	public:
 		CollisionResult() :
@@ -211,7 +212,7 @@ namespace LCN
 			m_Intersections{ IntersectionType(), IntersectionType() }
 		{}
 
-		const IntersectionType& operator[](size_t i) { return m_Intersections[i]; }
+		const IntersectionType& operator[](size_t i) const { return m_Intersections[i]; }
 
 		ConstIterator begin() const { return m_Intersections.begin(); }
 		ConstIterator end()   const { return m_Intersections.end(); }
