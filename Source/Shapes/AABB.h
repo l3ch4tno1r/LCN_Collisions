@@ -10,6 +10,10 @@
 
 namespace LCN
 {
+	//////////////
+	//-- AABB --//
+	//////////////
+
 	template<typename T, size_t Dim>
 	class AABB
 	{
@@ -17,6 +21,11 @@ namespace LCN
 		using ValType     = T;
 		using HVectorType = HVectorND<ValType, Dim>;
 		using RVectorType = VectorND<ValType, Dim>;
+
+		enum
+		{
+			NumFaces = 2 * Dim
+		};
 
 		AABB(const RVectorType& min, const RVectorType& max) :
 			m_Min(min, ValType(1)),
@@ -60,6 +69,63 @@ namespace LCN
 		HVectorType m_Max;
 	};
 
+	///////////////////////////////
+	//-- AABB normals sequence --//
+	///////////////////////////////
+
+	template<class AABBType, size_t ... Args>
+	struct AABBNormalsData
+	{
+		using HVectorType      = typename AABBType::HVectorType;
+		using HVectorArrayType = std::array<HVectorType, sizeof...(Args)>;
+
+		static const HVectorArrayType Normals;
+	};
+
+	template<class AABBType, size_t N, size_t ... Args>
+	struct IdxGenerator
+	{
+		using DataType = typename IdxGenerator<AABBType, N - 1, N, Args...>::DataType;
+	};
+
+	template<class AABBType, size_t ... Args>
+	struct IdxGenerator<AABBType, 0, Args...>
+	{
+		using DataType = typename AABBNormalsData<AABBType, Args...>;
+	};
+
+	template<class AABBType>
+	struct AABBNormals
+	{
+		using HVectorType      = typename AABBType::HVectorType;
+		using DataType         = typename IdxGenerator<AABBType, AABBType::NumFaces>::DataType;
+		using HVectorArrayType = typename DataType::HVectorArrayType;
+
+		inline static const HVectorArrayType& Normals() { return DataType::Normals; }
+
+		static HVectorType GenerateNormals(size_t i)
+		{
+			size_t _i = i % HVectorType::Dim;
+
+			HVectorType result(_i);
+
+			if (i < HVectorType::Dim)
+				result[_i] = HVectorType::ValType(-1);
+
+			return result;
+		}
+	};
+
+	template<class AABBType, size_t ... Args>
+	const std::array<typename AABBType::HVectorType, sizeof...(Args)> AABBNormalsData<AABBType, Args...>::Normals = { AABBNormals<AABBType>::GenerateNormals(Args - 1)... };
+
+	////////////////////////
+	//-- Shortcut types --//
+	////////////////////////
+
 	using AABB2Df = AABB<float, 2>;
 	using AABB3Df = AABB<float, 3>;
+
+	using AABBNormals2Df = AABBNormals<AABB2Df>;
+	using AABBNormals3Df = AABBNormals<AABB3Df>;
 }
