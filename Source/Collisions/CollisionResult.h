@@ -199,6 +199,7 @@ namespace LCN
 		
 		struct IntersectionType
 		{
+			size_t      FaceId;
 			HVectorType Point;
 			ValType     Distance;
 		};

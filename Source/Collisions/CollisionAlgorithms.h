@@ -214,19 +214,18 @@ namespace LCN
 		using RVectorType          = typename AABB<ValType, Dim>::RVectorType;
 		using HyperplaneType       = Hyperplane<ValType, Dim>;
 		using HyperplaneVSLineType = HyperplaneVSLine<ValType, Dim>;
+		using AABBNormalsType      = AABBNormals<AABB<T, Dim>>;
+
+		result.m_Collide = false;
 
 		auto resultIt = result.m_Intersections.begin();
 
-		for (size_t face = 0; face < 2 * Dim; ++face)
+		for (size_t faceId = 0; faceId < 2 * Dim; ++faceId)
 		{
-			RVectorType origin = face < Dim ? aabb.Min().Vector() : aabb.Max().Vector();
-			RVectorType normal;
+			RVectorType origin = faceId < Dim ? aabb.Min().Vector() : aabb.Max().Vector();
+			RVectorType normal = AABBNormalsType::Normals()[faceId].Vector();
 
-			size_t coord = face % Dim;
-			
-			// TODO : optimize that
-			for (size_t i = 0; i < Dim; ++i)
-				normal[i] = (i == coord ? (face < Dim ? ValType(-1) : ValType(1)) : ValType(0));
+			size_t coord = faceId % Dim;
 			
 			HyperplaneType hplane{ origin, normal };
 			
@@ -257,12 +256,18 @@ namespace LCN
 			if (!isValid)
 				continue;
 
-			ASSERT(resultIt < result.m_Intersections.end());
+			//ASSERT(resultIt < result.m_Intersections.end());
 
+			result.m_Collide = true;
+
+			resultIt->FaceId   = faceId;
 			resultIt->Point    = tempResult.Result();
 			resultIt->Distance = tempResult.Coordinate();
 
 			++resultIt;
+
+			if (resultIt >= result.m_Intersections.end())
+				break;
 		}
 
 		if (result[0].Distance > result[1].Distance)
