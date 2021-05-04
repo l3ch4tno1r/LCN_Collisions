@@ -11,7 +11,7 @@
 
 #include "LCN_Collisions/Source/Collisions/CollisionResult.h"
 
-#define FUZZ_FACTOR T(0.001);
+#define FUZZ_FACTOR T(0.001)
 
 namespace LCN
 {
