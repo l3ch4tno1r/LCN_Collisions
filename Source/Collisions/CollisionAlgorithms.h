@@ -208,70 +208,37 @@ namespace LCN
 	template<typename T, size_t Dim>
 	inline void ComputeCollision(const AABB<T, Dim>& aabb, const Line<T, Dim>& line, AABBVSLine<T, Dim>& result)
 	{
-		static_assert(Dim >= 2);
+		const auto& origin    = line.Origin();
+		const auto& direction = line.Direction();
+		const auto& min       = aabb.Min();
+		const auto& max       = aabb.Max();
 
-		using ValType              = T;
-		using RVectorType          = typename AABB<ValType, Dim>::RVectorType;
-		using HyperplaneType       = Hyperplane<ValType, Dim>;
-		using HyperplaneVSLineType = HyperplaneVSLine<ValType, Dim>;
-		using AABBNormalsType      = AABBNormals<AABB<T, Dim>>;
+		T tmaxmin = -std::numeric_limits<T>::infinity();
+		T tminmax =  std::numeric_limits<T>::infinity();
 
-		result.m_Collide = false;
-
-		auto resultIt = result.m_Intersections.begin();
-
-		for (size_t faceId = 0; faceId < 2 * Dim; ++faceId)
+		for (size_t i = 0; i < Dim; ++i)
 		{
-			RVectorType origin = faceId < Dim ? aabb.Min().Vector() : aabb.Max().Vector();
-			RVectorType normal = AABBNormalsType::Normals()[faceId].Vector();
-
-			size_t coord = faceId % Dim;
-			
-			HyperplaneType hplane{ origin, normal };
-			
-			HyperplaneVSLineType tempResult;
-			
-			ComputeCollision(hplane, line, tempResult);
-
-			if (!tempResult)
+			if (std::abs(direction[i]) < FUZZ_FACTOR && min[i] <= origin[i] && origin[i] <= max[i])
 				continue;
 
-			bool isValid = false;
+			T t1 = (min[i] - origin[i]) / direction[i];
+			T t2 = (max[i] - origin[i]) / direction[i];
 
-			// Checks if other coordinates are valid
-			for (size_t i = 1; i < Dim; ++i)
-			{
-				size_t currentCoord = (coord + i) % Dim;
+			T tmin = std::min(t1, t2);
+			T tmax = std::max(t1, t2);
 
-				const auto& min    = aabb.Min();
-				const auto& max    = aabb.Max();
-				const auto& result = tempResult.Result();
-
-				isValid = (min[currentCoord] <= result[currentCoord] && result[currentCoord] <= max[currentCoord]);
-
-				if (!isValid)
-					break;
-			}
-
-			if (!isValid)
-				continue;
-
-			//ASSERT(resultIt < result.m_Intersections.end());
-
-			result.m_Collide = true;
-
-			resultIt->FaceId   = faceId;
-			resultIt->Point    = tempResult.Result();
-			resultIt->Distance = tempResult.Coordinate();
-
-			++resultIt;
-
-			if (resultIt >= result.m_Intersections.end())
-				break;
+			tmaxmin = std::max(tmaxmin, tmin);
+			tminmax = std::min(tminmax, tmax);
 		}
 
-		if (result[0].Distance > result[1].Distance)
-			std::swap(result.m_Intersections[0], result.m_Intersections[1]);
+		if (!(result.m_Collide = (tmaxmin < tminmax)))
+			return;
+
+		result.m_Intersections[0].Distance = tmaxmin;
+		result.m_Intersections[1].Distance = tminmax;
+
+		result.m_Intersections[0].Point = tmaxmin * direction + origin;
+		result.m_Intersections[1].Point = tminmax * direction + origin;
 	}
 
 #pragma endregion
