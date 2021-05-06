@@ -216,6 +216,9 @@ namespace LCN
 		T tmaxmin = -std::numeric_limits<T>::infinity();
 		T tminmax =  std::numeric_limits<T>::infinity();
 
+		size_t faceId0 = 0;
+		size_t faceId1 = 2 * Dim - 1;
+
 		for (size_t i = 0; i < Dim; ++i)
 		{
 			if (std::abs(direction[i]) < FUZZ_FACTOR && min[i] <= origin[i] && origin[i] <= max[i])
@@ -227,8 +230,20 @@ namespace LCN
 			T tmin = std::min(t1, t2);
 			T tmax = std::max(t1, t2);
 
+			T oldtmaxmin = tmaxmin;
+			T oldtminmax = tminmax;
+
 			tmaxmin = std::max(tmaxmin, tmin);
 			tminmax = std::min(tminmax, tmax);
+
+			if (oldtmaxmin != tmaxmin)
+				result.m_Intersections[0].FaceId = t1 < t2 ? faceId0 : faceId1;
+
+			if (oldtminmax != tminmax)
+				result.m_Intersections[1].FaceId = t1 < t2 ? faceId1 : faceId0;
+
+			++faceId0;
+			--faceId1;
 		}
 
 		if (!(result.m_Collide = (tmaxmin < tminmax)))
