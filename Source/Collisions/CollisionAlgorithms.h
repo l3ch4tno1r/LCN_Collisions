@@ -221,8 +221,8 @@ namespace LCN
 
 		for (size_t i = 0; i < Dim; ++i)
 		{
-			if (std::abs(direction[i]) < FUZZ_FACTOR && min[i] <= origin[i] && origin[i] <= max[i])
-				continue;
+			//if (std::abs(direction[i]) < FUZZ_FACTOR && min[i] <= origin[i] && origin[i] <= max[i])
+			//	continue;
 
 			T t1 = (min[i] - origin[i]) / direction[i];
 			T t2 = (max[i] - origin[i]) / direction[i];
