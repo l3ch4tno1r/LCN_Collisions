@@ -27,6 +27,8 @@ namespace LCN
 			NumFaces = 2 * Dim
 		};
 
+		AABB() = default;
+
 		AABB(const RVectorType& min, const RVectorType& max) :
 			m_Min(min, ValType(1)),
 			m_Max(max, ValType(1))

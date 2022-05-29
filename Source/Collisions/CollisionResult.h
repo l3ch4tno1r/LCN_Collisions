@@ -46,12 +46,26 @@ namespace LCN
 
 		using HVectorType = typename PlaneType::HVectorType;
 
+		CollisionResult() = default;
+
+		CollisionResult(const HVectorType& inter, ValType coordinate) :
+			m_Intersection{ inter },
+			m_Coordinate{ coordinate }
+		{}
+
 		const HVectorType& Result() const { return m_Intersection; }
 
 		const ValType Coordinate() const { return m_Coordinate; }
 
 		template<typename T, size_t Dim>
 		friend void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>& result);
+
+		template<typename T, size_t Dim>
+		friend
+		std::optional<CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>>
+		ComputeCollision(
+			const Hyperplane<T, Dim>& hplane,
+			const Line<T, Dim>&       line);
 
 	private:
 		HVectorType m_Intersection;
@@ -130,6 +144,13 @@ namespace LCN
 			m_Intersections{ IntersectionType(), IntersectionType() }
 		{}
 
+		CollisionResult(
+			const HVectorType& point1, ValType distance1,
+			const HVectorType& point2, ValType distance2)
+			: Base{}
+			, m_Intersections{ IntersectionType{ point1, distance1 }, IntersectionType{ point2, distance2 } }
+		{}
+
 		template<typename T, size_t Dim>
 		friend void ComputeCollision(const SphereND<T, Dim>& sphere, const Line<T, Dim>& line, CollisionResult<SphereND<T, Dim>, Line<T, Dim>>& result);
 
@@ -159,9 +180,12 @@ namespace LCN
 	public:
 		using AABBType    = AABB<T, Dim>;
 		using HVectorType = typename AABBType::HVectorType;
+		using RVectorType = typename AABBType::RVectorType;
 
-		CollisionResult() :
-			m_Intersection({ {0, 0}, {0, 0} })
+		CollisionResult() = default;
+
+		CollisionResult(const RVectorType& min, const RVectorType& max)
+			: m_Intersection{ min, max }
 		{}
 
 		const AABBType& Result() const { return m_Intersection; }

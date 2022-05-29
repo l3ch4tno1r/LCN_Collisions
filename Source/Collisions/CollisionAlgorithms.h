@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <cmath>
 
 #include "LCN_Collisions/Source/Shapes/Point.h"
@@ -108,6 +109,19 @@ namespace LCN
 		ComputeCollision(shape2, shape1, result);
 	}
 
+	template<class Shape1, class Shape2>
+	inline auto
+	ComputeCollision(
+		const Shape1& shape1,
+		const Shape2& shape2)
+	{
+		return ComputeCollision(shape2, shape1);
+	}
+
+	///////////////////////////////
+	//-- Collision computation --//
+	///////////////////////////////
+
 	// Hyperplane vs Line intersection
 	template<typename T, size_t Dim>
 	inline void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, HyperplaneVSLine<T, Dim>& result)
@@ -130,7 +144,31 @@ namespace LCN
 		result.m_Intersection = k * d + o;
 	}
 
-	// Plane vs Line intersection
+	template<typename T, size_t Dim>	
+	std::optional<HyperplaneVSLine<T, Dim>>
+	ComputeCollision(
+		const Hyperplane<T, Dim>& hplane,
+		const Line<T, Dim>& line)
+	{
+		using HVectorType = typename Line<T, Dim>::HVectorType;
+		using ResultType  = std::optional<HyperplaneVSLine<T, Dim>>;
+
+		if (!DetectCollision(hplane, line))
+			return ResultType{ std::nullopt };
+
+		const HVectorType& p = hplane.Origin();
+		const HVectorType& n = hplane.Normal();
+		const HVectorType& o = line.Origin();
+		const HVectorType& d = line.Direction();
+
+		HVectorType po = o - p;
+
+		T k = -(po | n) / (d | n);
+
+		return ResultType{ std::in_place, k * d + o, k };
+	}
+
+	// Plane vs Line intersection (???)
 	template<typename T>
 	inline void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, PlaneVSLine<T>& result)
 	{
@@ -179,6 +217,36 @@ namespace LCN
 		result.m_Intersections[1].Point = t2 * line.Direction() + line.Origin();
 	}
 
+	template<typename T, size_t Dim>
+	std::optional<SphereVSLine<T, Dim>>
+	ComputeCollision(
+		const SphereND<T, Dim>& sphere,
+		const Line<T, Dim>& line)
+	{
+		using HVectorType = typename Line<T, Dim>::HVectorType;
+		using ResultType  = std::optional<SphereVSLine<T, Dim>>;
+
+		HVectorType co = line.Origin() - sphere.Center();
+		const HVectorType& v = line.Direction();
+
+		T r_2    = sphere.SquareRadius();
+		T vDotCO = (v | co);
+		T dCO_2  = co.SquareNorm();
+		T delta  = 4 * (vDotCO * vDotCO - dCO_2 + r_2);
+
+		if (delta < 0)
+			return ResultType{ std::nullopt };
+
+		T t1 = (-2 * vDotCO - std::sqrt(delta)) / 2;
+		T t2 = (-2 * vDotCO + std::sqrt(delta)) / 2;
+
+		return ResultType{
+			std::in_place,
+			t1 * line.Direction() + line.Origin(), t1,
+			t2 * line.Direction() + line.Origin(), t2
+		};
+	}
+
 	// AABB vs AABB
 	template<typename T, size_t Dim>
 	inline void ComputeCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2, AABBVSAABB<T, Dim>& result)
@@ -202,6 +270,29 @@ namespace LCN
 		}
 
 		result.m_Collide = true;
+	}
+
+	template<typename T, size_t Dim>
+	std::optional<AABBVSAABB<T, Dim>>
+	ComputeCollision(
+		const AABB<T, Dim>& aabb1,
+		const AABB<T, Dim>& aabb2)
+	{
+		using RVectorType = typename AABB<T, Dim>::RVectorType;
+		using ResultType  = std::optional<AABBVSAABB<T, Dim>>;
+
+		RVectorType maxmin, minmax;
+
+		for (size_t i = 0; i < Dim; ++i)
+		{
+			maxmin[i] = std::max(aabb1.Min()[i], aabb2.Min()[i]);
+			minmax[i] = std::min(aabb1.Max()[i], aabb2.Max()[i]);
+
+			if (maxmin[i] >= minmax[i])
+				return ResultType{ std::nullopt };
+		}
+
+		return ResultType{ std::in_place, maxmin, minmax };
 	}
 
 	// AABB vs Line
