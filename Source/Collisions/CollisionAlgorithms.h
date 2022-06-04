@@ -103,12 +103,6 @@ namespace LCN
 	///////////////////////////////////////
 
 	// Allows symetry (ComputeCollision(a, b) <=> DetectCollision(b, a))
-	template<class Shape1, class Shape2, class ResultType>
-	inline void ComputeCollision(const Shape1& shape1, const Shape2& shape2, ResultType& result)
-	{
-		ComputeCollision(shape2, shape1, result);
-	}
-
 	template<class Shape1, class Shape2>
 	inline auto
 	ComputeCollision(
@@ -123,27 +117,6 @@ namespace LCN
 	///////////////////////////////
 
 	// Hyperplane vs Line intersection
-	template<typename T, size_t Dim>
-	inline void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, HyperplaneVSLine<T, Dim>& result)
-	{
-		using HVectorType = typename Line<T, Dim>::HVectorType;
-
-		if (!(result.m_Collide = DetectCollision(hplane, line)))
-			return;
-
-		const HVectorType& p = hplane.Origin();
-		const HVectorType& n = hplane.Normal();
-		const HVectorType& o = line.Origin();
-		const HVectorType& d = line.Direction();
-
-		HVectorType po = o - p;
-
-		T k = -(po | n) / (d | n);
-		
-		result.m_Coordinate   = k;
-		result.m_Intersection = k * d + o;
-	}
-
 	template<typename T, size_t Dim>	
 	std::optional<HyperplaneVSLine<T, Dim>>
 	ComputeCollision(
@@ -168,55 +141,7 @@ namespace LCN
 		return ResultType{ std::in_place, k * d + o, k };
 	}
 
-	// Plane vs Line intersection (???)
-	template<typename T>
-	inline void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, PlaneVSLine<T>& result)
-	{
-		using HVectorType = typename Line<T, 3>::HVectorType;
-
-		if (!(result.m_Collide = DetectCollision(plane, line)))
-			return;
-
-		const HVectorType& p = plane.Origin();
-		const HVectorType& n = plane.Normal();
-		const HVectorType& o = line.Origin();
-		const HVectorType& d = line.Direction();
-
-		HVector3Df po = o - p;
-
-		T k = -(po | n) / (d | n);
-		
-		result.m_Coordinate   = k;
-		result.m_Intersection = k * d + o;
-	}
-
 	// SphereND vs Line intersection
-	template<typename T, size_t Dim>
-	inline void ComputeCollision(const SphereND<T, Dim>& sphere, const Line<T, Dim>& line, SphereVSLine<T, Dim>& result)
-	{
-		using HVectorType = typename Line<T, Dim>::HVectorType;
-
-		HVectorType co = line.Origin() - sphere.Center();
-		const HVectorType& v = line.Direction();
-
-		T r_2    = sphere.SquareRadius();
-		T vDotCO = (v | co);
-		T dCO_2  = co.SquareNorm();
-		T delta  = 4 * (vDotCO * vDotCO - dCO_2 + r_2);
-
-		if (!(result.m_Collide = (delta >= 0)))
-			return;
-
-		T t1 = (-2 * vDotCO - std::sqrt(delta)) / 2;
-		T t2 = (-2 * vDotCO + std::sqrt(delta)) / 2;
-
-		result.m_Intersections[0].Distance = t1;
-		result.m_Intersections[1].Distance = t2;
-
-		result.m_Intersections[0].Point = t1 * line.Direction() + line.Origin();
-		result.m_Intersections[1].Point = t2 * line.Direction() + line.Origin();
-	}
-
 	template<typename T, size_t Dim>
 	std::optional<SphereVSLine<T, Dim>>
 	ComputeCollision(
@@ -249,30 +174,6 @@ namespace LCN
 
 	// AABB vs AABB
 	template<typename T, size_t Dim>
-	inline void ComputeCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2, AABBVSAABB<T, Dim>& result)
-	{
-		using HVectorType = typename AABB<T, Dim>::HVectorType;
-
-		HVectorType& maxmin = result.m_Intersection.Min();
-		HVectorType& minmax = result.m_Intersection.Max();
-
-		for (size_t i = 0; i < Dim; ++i)
-		{
-			maxmin[i] = std::max(aabb1.Min()[i], aabb2.Min()[i]);
-			minmax[i] = std::min(aabb1.Max()[i], aabb2.Max()[i]);
-
-			if (maxmin[i] < minmax[i])
-				continue;
-
-			result.m_Collide = false;
-
-			return;
-		}
-
-		result.m_Collide = true;
-	}
-
-	template<typename T, size_t Dim>
 	std::optional<AABBVSAABB<T, Dim>>
 	ComputeCollision(
 		const AABB<T, Dim>& aabb1,
@@ -297,8 +198,13 @@ namespace LCN
 
 	// AABB vs Line
 	template<typename T, size_t Dim>
-	inline void ComputeCollision(const AABB<T, Dim>& aabb, const Line<T, Dim>& line, AABBVSLine<T, Dim>& result)
+	std::optional<AABBVSLine<T, Dim>>
+	ComputeCollision(
+		const AABB<T, Dim>& aabb,
+		const Line<T, Dim>& line)
 	{
+		using ResultType = std::optional<AABBVSLine<T, Dim>>;
+
 		const auto& origin    = line.Origin();
 		const auto& direction = line.Direction();
 		const auto& min       = aabb.Min();
@@ -309,6 +215,8 @@ namespace LCN
 
 		size_t faceId0 = 0;
 		size_t faceId1 = 2 * Dim - 1;
+
+		AABBVSLine<T, Dim> result;
 
 		for (size_t i = 0; i < Dim; ++i)
 		{
@@ -337,14 +245,16 @@ namespace LCN
 			--faceId1;
 		}
 
-		if (!(result.m_Collide = (tmaxmin < tminmax)))
-			return;
+		if (tmaxmin >= tminmax)
+			return ResultType{ std::nullopt };
 
 		result.m_Intersections[0].Distance = tmaxmin;
 		result.m_Intersections[1].Distance = tminmax;
 
 		result.m_Intersections[0].Point = tmaxmin * direction + origin;
 		result.m_Intersections[1].Point = tminmax * direction + origin;
+
+		return ResultType{ std::in_place, result };
 	}
 
 #pragma endregion

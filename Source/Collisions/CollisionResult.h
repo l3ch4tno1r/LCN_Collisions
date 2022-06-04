@@ -8,19 +8,6 @@
 
 namespace LCN
 {
-	/////////////////////////////
-	//-- CollisionResultBase --//
-	/////////////////////////////
-
-	class CollisionResultBase
-	{
-	public:
-		inline operator bool() const { return m_Collide; }
-
-	protected:
-		bool m_Collide = false;
-	};
-
 	/////////////////////////////////////////////
 	//-- CollisionResult and specializations --//
 	/////////////////////////////////////////////
@@ -35,10 +22,10 @@ namespace LCN
 	////////////////////////////
 
 	template<typename T, size_t Dim>
-	class CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>> : public CollisionResultBase
+	class CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>
 	{
 	public:
-		using ValType = T;
+		using ValType   = T;
 		using PlaneType = Hyperplane<T, Dim>;
 		using LineType  = Line<ValType, Dim>;
 
@@ -56,9 +43,6 @@ namespace LCN
 		const HVectorType& Result() const { return m_Intersection; }
 
 		const ValType Coordinate() const { return m_Coordinate; }
-
-		template<typename T, size_t Dim>
-		friend void ComputeCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line, CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>& result);
 
 		template<typename T, size_t Dim>
 		friend
@@ -84,7 +68,7 @@ namespace LCN
 	/////////////////////////////////
 
 	template<typename T>
-	class CollisionResult<Plane<T>, Line<T, 3>> : public CollisionResultBase
+	class CollisionResult<Plane<T>, Line<T, 3>>
 	{
 	public:
 		using ValType   = T;
@@ -98,9 +82,6 @@ namespace LCN
 		const HVectorType& Result() const { return m_Intersection; }
 
 		const ValType Coordinate() const { return m_Coordinate; }
-
-		template<typename T>
-		friend void ComputeCollision(const Plane<T>& plane, const Line<T, 3>& line, CollisionResult<Plane<T>, Line<T, 3>>& result);
 
 	private:
 		HVectorType m_Intersection;
@@ -119,11 +100,10 @@ namespace LCN
 	//////////////////////////
 
 	template<typename T, size_t Dim>
-	class CollisionResult<SphereND<T, Dim>, Line<T, Dim>> : public CollisionResultBase
+	class CollisionResult<SphereND<T, Dim>, Line<T, Dim>>
 	{
 	public:
 		using ValType    = T;
-		using Base       = CollisionResultBase;
 		using SphereType = SphereND<T, Dim>;
 		using LineType   = Line<T, Dim>;
 
@@ -140,19 +120,14 @@ namespace LCN
 		using ConstIterator = typename std::array<IntersectionType, 2>::const_iterator;
 
 		CollisionResult() :
-			Base(),
 			m_Intersections{ IntersectionType(), IntersectionType() }
 		{}
 
 		CollisionResult(
 			const HVectorType& point1, ValType distance1,
 			const HVectorType& point2, ValType distance2)
-			: Base{}
-			, m_Intersections{ IntersectionType{ point1, distance1 }, IntersectionType{ point2, distance2 } }
+			: m_Intersections{ IntersectionType{ point1, distance1 }, IntersectionType{ point2, distance2 } }
 		{}
-
-		template<typename T, size_t Dim>
-		friend void ComputeCollision(const SphereND<T, Dim>& sphere, const Line<T, Dim>& line, CollisionResult<SphereND<T, Dim>, Line<T, Dim>>& result);
 
 		const IntersectionType& operator[](size_t i) { return m_Intersections[i]; }
 
@@ -175,7 +150,7 @@ namespace LCN
 	//////////////////////
 
 	template<typename T, size_t Dim>
-	class CollisionResult<AABB<T, Dim>, AABB<T, Dim>> : public CollisionResultBase
+	class CollisionResult<AABB<T, Dim>, AABB<T, Dim>>
 	{
 	public:
 		using AABBType    = AABB<T, Dim>;
@@ -189,9 +164,6 @@ namespace LCN
 		{}
 
 		const AABBType& Result() const { return m_Intersection; }
-
-		template<typename T, size_t Dim>
-		friend void ComputeCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2, CollisionResult<AABB<T, Dim>, AABB<T, Dim>>& result);
 
 	private:
 		AABBType m_Intersection;
@@ -209,11 +181,10 @@ namespace LCN
 	//////////////////////
 
 	template<typename T, size_t Dim>
-	class CollisionResult<AABB<T, Dim>, Line<T, Dim>> : public CollisionResultBase
+	class CollisionResult<AABB<T, Dim>, Line<T, Dim>>
 	{
 	public:
-		using Base    = CollisionResultBase;
-		using ValType = T;
+		using ValType  = T;
 		using AABBType = AABB<ValType, Dim>;
 		using LineType = Line<ValType, Dim>;
 
@@ -229,13 +200,15 @@ namespace LCN
 		};
 
 		using ConstIterator = typename std::array<IntersectionType, 2>::const_iterator;
-		using ConstIterator = typename std::array<IntersectionType, 2>::const_iterator;
 
 	public:
 		CollisionResult() :
-			Base(),
 			m_Intersections{ IntersectionType(), IntersectionType() }
 		{}
+
+		CollisionResult(const CollisionResult& other) :
+			m_Intersections{ other.m_Intersections[0], other.m_Intersections[1] }
+		{};
 
 		const IntersectionType& operator[](size_t i) const { return m_Intersections[i]; }
 
@@ -243,7 +216,11 @@ namespace LCN
 		ConstIterator end()   const { return m_Intersections.end(); }
 
 		template<typename T, size_t Dim>
-		friend void ComputeCollision(const AABB<T, Dim>& aabb, const Line<T, Dim>& line, CollisionResult<AABB<T, Dim>, Line<T, Dim>>& result);
+		friend
+		std::optional<CollisionResult<AABB<T, Dim>, Line<T, Dim>>>
+		ComputeCollision(
+			const AABB<T, Dim>&,
+			const Line<T, Dim>&);
 
 	private:
 		std::array<IntersectionType, 2> m_Intersections;
