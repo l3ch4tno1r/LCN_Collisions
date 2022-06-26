@@ -24,14 +24,20 @@ namespace LCN
 
 	// Allows symetry (DetectCollision(a, b) <=> DetectCollision(b, a))
 	template<class Shape1, class Shape2>
-	inline bool DetectCollision(const Shape1& shape1, const Shape2& shape2)
+	inline bool
+	DetectCollision(
+		const Shape1& shape1,
+		const Shape2& shape2)
 	{
 		return DetectCollision(shape2, shape1);
 	}
 
 	// AABB vs point
 	template<typename T>
-	inline bool DetectCollision(const AABB<T, 2>& aabb, const Point<T, 2>& point)
+	inline bool
+	DetectCollision(
+		const AABB<T, 2>& aabb,
+		const Point<T, 2>& point)
 	{
 		const Point<T, 2>& topLeft = aabb.TopLeft();
 
@@ -42,7 +48,10 @@ namespace LCN
 
 	// AABB vs AABB
 	template<typename T, size_t Dim>
-	inline bool DetectCollision(const AABB<T, Dim>& aabb1, const AABB<T, Dim>& aabb2)
+	inline bool
+	DetectCollision(
+		const AABB<T, Dim>& aabb1,
+		const AABB<T, Dim>& aabb2)
 	{
 		using HVectorType = typename AABB<T, Dim>::HVectorType;
 
@@ -60,28 +69,40 @@ namespace LCN
 
 	// Hyperplane vs Line
 	template<typename T, size_t Dim>
-	inline bool DetectCollision(const Hyperplane<T, Dim>& hplane, const Line<T, Dim>& line)
+	inline bool
+	DetectCollision(
+		const Hyperplane<T, Dim>& hplane,
+		const Line<T, Dim>& line)
 	{
 		return std::abs(hplane.Normal() | line.Direction()) > FUZZ_FACTOR;
 	}
 
 	// Plane vs Line
 	template<typename T>
-	inline bool DetectCollision(const Plane<T>& plane, const Line<T, 3>& line)
+	inline bool
+	DetectCollision(
+		const Plane<T>& plane,
+		const Line<T, 3>& line)
 	{
 		return std::abs(plane.Normal() | line.Direction()) > FUZZ_FACTOR;
 	}
 
 	// Plane vs Plane
 	template<typename T>
-	inline bool DetectCollision(const Plane<T>& plane1, const Plane<T>& plane2)
+	inline bool
+	DetectCollision(
+		const Plane<T>& plane1,
+		const Plane<T>& plane2)
 	{
 		return std::abs(plane1.Normal() | plane2.Normal()) > FUZZ_FACTOR;
 	}
 
 	// Sphere vs Line
 	template<typename T, size_t Dim>
-	inline bool DetectCollision(const SphereND<T, Dim>& sphere, const Line<T, Dim>& line)
+	inline bool
+	DetectCollision(
+		const SphereND<T, Dim>& sphere,
+		const Line<T, Dim>& line)
 	{
 		using HVectorType = typename SphereND<T, Dim>::HVectorType;
 
