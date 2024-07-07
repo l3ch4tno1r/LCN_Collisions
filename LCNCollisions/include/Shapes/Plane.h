@@ -1,6 +1,6 @@
 #pragma once
 
-#include <LCN_Math/Source/Geometry/Geometry.h>
+#include <LCNMath/Geometry/Geometry.h>
 
 namespace LCN
 {
