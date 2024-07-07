@@ -3,19 +3,22 @@
 #include <optional>
 #include <cmath>
 
-#include "Shapes/Point.h"
-#include "Shapes/Line.h"
-#include "Shapes/AABB.h"
-#include "Shapes/Plane.h"
-#include "Shapes/Hyperplane.h"
-#include "Shapes/Sphere.h"
+#include "Collisions/Shapes/Point.h"
+#include "Collisions/Shapes/Line.h"
+#include "Collisions/Shapes/AABB.h"
+#include "Collisions/Shapes/Plane.h"
+#include "Collisions/Shapes/Hyperplane.h"
+#include "Collisions/Shapes/Sphere.h"
 
-#include "Collisions/CollisionResult.h"
+#include "CollisionResult.h"
 
 #define FUZZ_FACTOR T(0.001)
 
-namespace LCN
+namespace LCN::Collisions::Algorithms
 {
+	using namespace Shapes;
+	using namespace Results;
+
 #pragma region Dectection
 
 	//////////////////////////////////

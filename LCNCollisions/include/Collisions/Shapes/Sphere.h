@@ -2,7 +2,7 @@
 
 #include <LCNMath/Geometry/Geometry.h>
 
-namespace LCN
+namespace LCN::Collisions::Shapes
 {
 	////////////////////////////
 	//-- Sphere N dimension --//

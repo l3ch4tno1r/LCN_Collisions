@@ -3,11 +3,13 @@
 #include <type_traits>
 #include <array>
 
-#include "Shapes/Plane.h"
-#include "Shapes/Line.h"
+#include "Collisions/Shapes/Plane.h"
+#include "Collisions/Shapes/Line.h"
 
-namespace LCN
+namespace LCN::Collisions::Results
 {
+	using namespace Shapes;
+	
 	/////////////////////////////////////////////
 	//-- CollisionResult and specializations --//
 	/////////////////////////////////////////////

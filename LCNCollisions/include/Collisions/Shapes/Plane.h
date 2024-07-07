@@ -2,17 +2,17 @@
 
 #include <LCNMath/Geometry/Geometry.h>
 
-namespace LCN
+namespace LCN::Collisions::Shapes
 {
-	template<typename T, size_t Dim>
-	class Hyperplane
+	template<typename T>
+	class Plane
 	{
 	public:
 		using ValType     = T;
-		using HVectorType = HVectorND<ValType, Dim>;
-		using RVectorType = VectorND<ValType, Dim>;
+		using HVectorType = HVector3Df;
+		using RVectorType = Vector3Df;
 
-		Hyperplane(const RVectorType& origin, const RVectorType& normal) :
+		Plane(const RVectorType& origin, const RVectorType& normal) :
 			m_Origin(origin, ValType(1)),
 			m_Normal(normal, ValType(0))
 		{
@@ -33,6 +33,5 @@ namespace LCN
 		HVectorType m_Normal;
 	};
 
-	using Hyperplane2Df = Hyperplane<float, 2>;
-	using Hyperplane3Df = Hyperplane<float, 3>;
+	using Plane3Df = Plane<float>;
 }

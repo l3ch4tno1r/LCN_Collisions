@@ -7,7 +7,7 @@
 
 #include <LCNMath/Geometry/Geometry.h>
 
-namespace LCN
+namespace LCN::Collisions::Shapes
 {
 	template<typename T, size_t Dim>
 	using Point = HVectorND<T, Dim>;

@@ -6,7 +6,7 @@
 #define DEBUG
 #endif // _DEBUG
 
-namespace LCN
+namespace LCN::Collisions::Shapes
 {
 	//////////////
 	//-- AABB --//
