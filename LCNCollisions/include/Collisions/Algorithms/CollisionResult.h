@@ -46,12 +46,12 @@ namespace LCN::Collisions::Results
 
 		const ValType Coordinate() const { return m_Coordinate; }
 
-		template<typename T, size_t Dim>
+		template<typename _T, size_t _Dim>
 		friend
-		std::optional<CollisionResult<Hyperplane<T, Dim>, Line<T, Dim>>>
+		std::optional<CollisionResult<Hyperplane<_T, _Dim>, Line<_T, _Dim>>>
 		ComputeCollision(
-			const Hyperplane<T, Dim>& hplane,
-			const Line<T, Dim>&       line);
+			const Hyperplane<_T, _Dim>& hplane,
+			const Line<_T, _Dim>&       line);
 
 	private:
 		HVectorType m_Intersection;
@@ -217,12 +217,12 @@ namespace LCN::Collisions::Results
 		ConstIterator begin() const { return m_Intersections.begin(); }
 		ConstIterator end()   const { return m_Intersections.end(); }
 
-		template<typename T, size_t Dim>
+		template<typename _T, size_t _Dim>
 		friend
-		std::optional<CollisionResult<AABB<T, Dim>, Line<T, Dim>>>
+		std::optional<CollisionResult<AABB<_T, _Dim>, Line<_T, _Dim>>>
 		ComputeCollision(
-			const AABB<T, Dim>&,
-			const Line<T, Dim>&);
+			const AABB<_T, _Dim>&,
+			const Line<_T, _Dim>&);
 
 	private:
 		std::array<IntersectionType, 2> m_Intersections;

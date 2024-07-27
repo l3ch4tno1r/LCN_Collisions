@@ -9,8 +9,8 @@ namespace LCN::Collisions::Shapes
 	{
 	public:
 		using ValType     = T;
-		using HVectorType = HVector3Df;
-		using RVectorType = Vector3Df;
+		using HVectorType = LCN::Math::HVector3Df;
+		using RVectorType = LCN::Math::Vector3Df;
 
 		Plane(const RVectorType& origin, const RVectorType& normal) :
 			m_Origin(origin, ValType(1)),

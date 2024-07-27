@@ -14,8 +14,8 @@ namespace LCN::Collisions::Shapes
 	{
 	public:
 		using ValType     = T;
-		using HVectorType = HVectorND<T, Dim>;
-		using RVectorType = VectorND<T, Dim>;
+		using HVectorType = LCN::Math::HVectorND<T, Dim>;
+		using RVectorType = LCN::Math::VectorND<T, Dim>;
 
 		Line(const RVectorType& origin, const RVectorType& direction) :
 			m_Origin(origin, ValType(1)),

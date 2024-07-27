@@ -17,8 +17,8 @@ namespace LCN::Collisions::Shapes
 	{
 	public:
 		using ValType     = T;
-		using HVectorType = HVectorND<ValType, Dim>;
-		using RVectorType = VectorND<ValType, Dim>;
+		using HVectorType = LCN::Math::HVectorND<ValType, Dim>;
+		using RVectorType = LCN::Math::VectorND<ValType, Dim>;
 
 		enum
 		{
@@ -91,7 +91,7 @@ namespace LCN::Collisions::Shapes
 	template<class AABBType, size_t ... Args>
 	struct IdxGenerator<AABBType, 0, Args...>
 	{
-		using DataType = typename AABBNormalsData<AABBType, Args...>;
+		using DataType = AABBNormalsData<AABBType, Args...>;
 	};
 
 	template<class AABBType>

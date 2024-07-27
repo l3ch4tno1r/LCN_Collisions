@@ -12,8 +12,8 @@ namespace LCN::Collisions::Shapes
 	{
 	public:
 		using RefType     = ValType&;
-		using HVectorType = HVectorND<ValType, Dim>;
-		using RVectorType = VectorND<ValType, Dim>;
+		using HVectorType = LCN::Math::HVectorND<ValType, Dim>;
+		using RVectorType = LCN::Math::VectorND<ValType, Dim>;
 
 		SphereND(const RVectorType& center, ValType radius) :
 			m_Center(center, ValType(1)),
