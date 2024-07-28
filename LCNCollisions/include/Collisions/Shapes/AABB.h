@@ -41,6 +41,46 @@ namespace LCN::Collisions::Shapes
 		inline const HVectorType& Max() const { return m_Max; }
 		inline       HVectorType& Max()       { return m_Max; }
 
+		std::enable_if_t<
+			Dim <= 2,
+			HVectorType>
+		TopLeft() const
+		{
+			return {
+				m_Min.x(),
+				m_Max.y(),
+				ValType{ 1 }
+			};
+		}
+
+		std::enable_if_t<
+			Dim <= 2,
+			HVectorType>
+		TopRight() const
+		{
+			return m_Max;
+		}
+
+		std::enable_if_t<
+			Dim <= 2,
+			HVectorType>
+		BottomLeft() const
+		{
+			return m_Min;
+		}
+
+		std::enable_if_t<
+			Dim <= 2,
+			HVectorType>
+		BottomRight() const
+		{
+			return {
+				m_Max.x(),
+				m_Min.y(),
+				ValType{ 1 }
+			};
+		}
+
 		ValType Length() const
 		{
 			static_assert(Dim >= 3);
