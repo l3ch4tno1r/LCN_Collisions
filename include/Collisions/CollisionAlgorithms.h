@@ -3,14 +3,14 @@
 #include <optional>
 #include <cmath>
 
-#include "LCN_Collisions/Source/Shapes/Point.h"
-#include "LCN_Collisions/Source/Shapes/Line.h"
-#include "LCN_Collisions/Source/Shapes/AABB.h"
-#include "LCN_Collisions/Source/Shapes/Plane.h"
-#include "LCN_Collisions/Source/Shapes/Hyperplane.h"
-#include "LCN_Collisions/Source/Shapes/Sphere.h"
+#include "Shapes/Point.h"
+#include "Shapes/Line.h"
+#include "Shapes/AABB.h"
+#include "Shapes/Plane.h"
+#include "Shapes/Hyperplane.h"
+#include "Shapes/Sphere.h"
 
-#include "LCN_Collisions/Source/Collisions/CollisionResult.h"
+#include "Collisions/CollisionResult.h"
 
 #define FUZZ_FACTOR T(0.001)
 

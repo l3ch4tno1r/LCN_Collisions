@@ -1,12 +1,12 @@
 #pragma once
 
-#include <LCN_Math/Source/Geometry/Geometry.h>
+#include "Geometry/Geometry.h"
 
 #ifdef _DEBUG
 #define DEBUG
 #endif // _DEBUG
 
-#include <Utilities/Source/ErrorHandling.h>
+#include "Utilities/ErrorHandling.h"
 
 namespace LCN
 {

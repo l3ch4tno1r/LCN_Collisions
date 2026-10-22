@@ -3,8 +3,8 @@
 #include <type_traits>
 #include <array>
 
-#include "LCN_Collisions/Source/Shapes/Plane.h"
-#include "LCN_Collisions/Source/Shapes/Line.h"
+#include "Shapes/Plane.h"
+#include "Shapes/Line.h"
 
 namespace LCN
 {
